@@ -1,0 +1,30 @@
+import { NewEpisodeAnime } from "@/components/mock/anime";
+import { Image, StyleSheet, Text, View } from "react-native";
+
+export function NewEpisodeCard({ anime }: { anime: NewEpisodeAnime }) {
+  return (
+    <View style={styles.container}>
+      <Image source={{ uri: anime.coverImage }} style={styles.image} />
+      <Text style={styles.title} numberOfLines={1}>
+        {anime.title}
+      </Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    width: 160,
+  },
+  image: {
+    width: 160,
+    height: 100,
+    borderRadius: 14,
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+});
