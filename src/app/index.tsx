@@ -1,9 +1,13 @@
+import { palette } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { Image, StyleSheet, View } from "react-native";
 
 export default function Index() {
   const router = useRouter();
+  const { colorScheme } = useTheme();
+  const styles = getStyles(colorScheme);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -23,11 +27,15 @@ export default function Index() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#000000",
-  },
-});
+const getStyles = (scheme: "light" | "dark") => {
+  const colors = palette[scheme];
+
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.background,
+    },
+  });
+};
