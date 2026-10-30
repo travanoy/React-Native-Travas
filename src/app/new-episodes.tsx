@@ -37,12 +37,15 @@ export default function NewEpisodesScreen() {
       <FlatList
         data={animeList}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <Pressable
+            style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+            onPress={() => router.push(`/anime/${item.id}/page`)}
+          >
             <Image source={{ uri: item.coverImage }} style={styles.image} />
             <Text style={styles.title} numberOfLines={1}>
               {item.title}
             </Text>
-          </View>
+          </Pressable>
         )}
         keyExtractor={(item) => item.id}
         refreshing={refreshing}
@@ -103,6 +106,9 @@ const getStyles = (scheme: "light" | "dark") => {
       fontSize: 16,
       fontWeight: "600",
       color: colors.text,
+    },
+    pressed: {
+      opacity: 0.8,
     },
   });
 };

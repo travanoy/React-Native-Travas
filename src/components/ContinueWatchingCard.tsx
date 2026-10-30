@@ -1,14 +1,18 @@
 import { palette } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { ContinueWatchingAnime } from "@/components/mock/anime";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { router } from "expo-router";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export function ContinueWatchingCard({ anime }: { anime: ContinueWatchingAnime }) {
   const { colorScheme } = useTheme();
   const styles = getStyles(colorScheme);
 
   return (
-    <View style={styles.container}>
+    <Pressable
+      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+      onPress={() => router.push(`/anime/${anime.id}/page`)}
+    >
       <Image source={{ uri: anime.coverImage }} style={styles.image} />
       <View style={styles.progressTrack}>
         <View style={[styles.progressFill, { width: `${anime.progress * 100}%` }]} />
@@ -19,7 +23,7 @@ export function ContinueWatchingCard({ anime }: { anime: ContinueWatchingAnime }
       <Text style={styles.time}>
         {anime.currentTime} / {anime.totalTime}
       </Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -58,6 +62,9 @@ const getStyles = (scheme: "light" | "dark") => {
     time: {
       fontSize: 12,
       color: colors.textMuted,
+    },
+    pressed: {
+      opacity: 0.8,
     },
   });
 };

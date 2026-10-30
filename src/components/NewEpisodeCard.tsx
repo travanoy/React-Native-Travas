@@ -1,19 +1,23 @@
 import { palette } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { NewEpisodeAnime } from "@/components/mock/anime";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { router } from "expo-router";
+import { Image, Pressable, StyleSheet, Text } from "react-native";
 
 export function NewEpisodeCard({ anime }: { anime: NewEpisodeAnime }) {
   const { colorScheme } = useTheme();
   const styles = getStyles(colorScheme);
 
   return (
-    <View style={styles.container}>
+    <Pressable
+      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+      onPress={() => router.push(`/anime/${anime.id}/page`)}
+    >
       <Image source={{ uri: anime.coverImage }} style={styles.image} />
       <Text style={styles.title} numberOfLines={1}>
         {anime.title}
       </Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -34,6 +38,9 @@ const getStyles = (scheme: "light" | "dark") => {
       fontSize: 14,
       fontWeight: "600",
       color: colors.text,
+    },
+    pressed: {
+      opacity: 0.8,
     },
   });
 };

@@ -1,20 +1,14 @@
 import { palette } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { ThemeType } from "@/types/theme-types";
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const THEME_OPTIONS: { value: ThemeType; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { value: "system", label: "System", icon: "phone-portrait-outline" },
-  { value: "light", label: "Light", icon: "sunny-outline" },
-  { value: "dark", label: "Dark", icon: "moon-outline" },
-];
-
 export default function Profile() {
-  const { theme, colorScheme, toggleTheme } = useTheme();
+  const { colorScheme, toggleTheme } = useTheme();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
+  const isDark = colorScheme === "dark";
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -25,24 +19,24 @@ export default function Profile() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Appearance</Text>
 
-        {THEME_OPTIONS.map((option) => {
-          const isActive = theme === option.value;
+        <View style={styles.option}>
+          <View style={styles.optionLeft}>
+            <Ionicons
+              name={isDark ? "moon-outline" : "sunny-outline"}
+              size={20}
+              color={colors.text}
+            />
+            <Text style={styles.optionLabel}>{isDark ? "Dark theme" : "Light theme"}</Text>
+          </View>
 
-          return (
-            <Pressable
-              key={option.value}
-              style={[styles.option, isActive && styles.optionActive]}
-              onPress={() => toggleTheme(option.value)}
-            >
-              <View style={styles.optionLeft}>
-                <Ionicons name={option.icon} size={20} color={colors.text} />
-                <Text style={styles.optionLabel}>{option.label}</Text>
-              </View>
-
-              {isActive && <Ionicons name="checkmark-circle" size={22} color={colors.primary} />}
-            </Pressable>
-          );
-        })}
+          <Switch
+            value={isDark}
+            onValueChange={(value) => toggleTheme(value ? "dark" : "light")}
+            trackColor={{ false: colors.switchTrackOff, true: colors.switchTrackOn }}
+            thumbColor={colors.switchThumb}
+            ios_backgroundColor={colors.switchTrackOff}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -86,9 +80,6 @@ const getStyles = (scheme: "light" | "dark") => {
       paddingVertical: 16,
       borderWidth: 1,
       borderColor: colors.border,
-    },
-    optionActive: {
-      borderColor: colors.primary,
     },
     optionLeft: {
       flexDirection: "row",

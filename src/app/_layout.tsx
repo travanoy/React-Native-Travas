@@ -16,6 +16,7 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="continue-watching" options={{ headerShown: false }} />
         <Stack.Screen name="new-episodes" options={{ headerShown: false }} />
+        <Stack.Screen name="anime/[id]/page" options={{ headerShown: false }} />
       </Stack>
     </>
   );

@@ -37,7 +37,10 @@ export default function ContinueWatchingScreen() {
       <FlatList
         data={animeList}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <Pressable
+            style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+            onPress={() => router.push(`/anime/${item.id}/page`)}
+          >
             <Image source={{ uri: item.coverImage }} style={styles.image} />
 
             <View style={styles.info}>
@@ -51,7 +54,7 @@ export default function ContinueWatchingScreen() {
                 <View style={[styles.progressFill, { width: `${item.progress * 100}%` }]} />
               </View>
             </View>
-          </View>
+          </Pressable>
         )}
         keyExtractor={(item) => item.id}
         refreshing={refreshing}
@@ -131,6 +134,9 @@ const getStyles = (scheme: "light" | "dark") => {
       height: "100%",
       borderRadius: 2,
       backgroundColor: colors.primary,
+    },
+    pressed: {
+      opacity: 0.8,
     },
   });
 };

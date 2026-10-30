@@ -1,6 +1,7 @@
 import { palette } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { BannerAnime } from "@/components/mock/anime";
 
@@ -24,7 +25,10 @@ export function AnimeBanner({ anime }: { anime: BannerAnime }) {
         <Text style={styles.englishTitle}>{anime.englishTitle}</Text>
       </View>
 
-      <Pressable style={styles.watchButton}>
+      <Pressable
+        style={styles.watchButton}
+        onPress={() => router.push(`/anime/${anime.id}/page`)}
+      >
         <Ionicons name="play" size={16} color={colors.primaryText} />
         <Text style={styles.watchText}>Watch</Text>
       </Pressable>
