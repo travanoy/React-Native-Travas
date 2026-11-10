@@ -3,10 +3,6 @@ import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 import { Platform } from "react-native";
 
-/**
- * Запрашивает разрешение на пуш и отправляет Expo-токен на бэкенд.
- * Вызывается после входа (таб-навигатор) — fire-and-forget, ошибки не роняют UI.
- */
 export async function registerPushToken(): Promise<void> {
   try {
     if (Platform.OS === "web") {
@@ -39,10 +35,6 @@ function navigateToAnime(data: unknown): void {
   }
 }
 
-/**
- * Обработка тапа по пушу: открываем страницу аниме.
- * Возвращает функцию отписки.
- */
 export function setupNotificationNavigation(): () => void {
   const subscription = Notifications.addNotificationResponseReceivedListener(
     (response) => navigateToAnime(response.notification.request.content.data),

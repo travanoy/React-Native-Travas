@@ -1,4 +1,5 @@
 import { palette } from "@/constants/theme";
+import { useLanguage } from "@/hooks/use-language";
 import { useTheme } from "@/hooks/use-theme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -7,6 +8,7 @@ import type { BannerAnime } from "@/types/anime-types";
 
 export function AnimeBanner({ anime }: { anime: BannerAnime }) {
   const { colorScheme } = useTheme();
+  const { t } = useLanguage();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
 
@@ -30,7 +32,7 @@ export function AnimeBanner({ anime }: { anime: BannerAnime }) {
         onPress={() => router.push(`/anime/${anime.id}/page`)}
       >
         <Ionicons name="play" size={16} color={colors.primaryText} />
-        <Text style={styles.watchText}>Watch</Text>
+        <Text style={styles.watchText}>{t("common.watch")}</Text>
       </Pressable>
     </View>
   );

@@ -27,7 +27,6 @@ export const authApi = {
 
   me: () => http.get<User>("/auth/me"),
 
-  /** Обёртка сама достаёт refresh-токен из хранилища. */
   logout: async () => {
     const refreshToken = await getRefreshToken();
     return http.post<void>("/auth/logout", { refreshToken });

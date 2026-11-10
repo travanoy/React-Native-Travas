@@ -32,7 +32,6 @@ export const setRefreshToken = async (token: string): Promise<void> => {
   await AsyncStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, token);
 };
 
-/** Сохраняет пару токенов одной операцией, чтобы не было рассинхрона. */
 export const setAuthTokens = async (
   accessToken: string,
   refreshToken: string,

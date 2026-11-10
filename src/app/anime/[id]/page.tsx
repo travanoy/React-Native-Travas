@@ -4,6 +4,7 @@ import { savedApi } from "@/api/saved.api";
 import { palette } from "@/constants/theme";
 import { useWatchStatuses } from "@/hooks/use-collections";
 import { useAnimeDetail } from "@/hooks/use-anime";
+import { useLanguage } from "@/hooks/use-language";
 import { useTheme } from "@/hooks/use-theme";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -18,6 +19,7 @@ export default function AnimeDetailsScreen() {
   const params = useLocalSearchParams<{ id: string }>();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const { colorScheme } = useTheme();
+  const { t } = useLanguage();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
   const { bottom } = useSafeAreaInsets();
@@ -53,8 +55,8 @@ export default function AnimeDetailsScreen() {
     } catch (cause) {
       setStatusSlug(previous);
       Alert.alert(
-        "Error",
-        cause instanceof Error ? cause.message : "Could not update list.",
+        t("common.error"),
+        cause instanceof Error ? cause.message : t("anime.updateError"),
       );
     } finally {
       setSavingStatus(false);
@@ -64,7 +66,7 @@ export default function AnimeDetailsScreen() {
   if (loading && !anime) {
     return (
       <SafeAreaView style={[styles.screen, styles.centered]}>
-        <LoadingState label="Loading anime..." />
+        <LoadingState label={t("anime.loading")} />
       </SafeAreaView>
     );
   }
@@ -74,7 +76,7 @@ export default function AnimeDetailsScreen() {
       <SafeAreaView style={[styles.screen, styles.centered]}>
         <ErrorState message={error} onRetry={() => void refetch()} />
         <Pressable onPress={goBack} hitSlop={8}>
-          <Text style={styles.link}>Go back</Text>
+          <Text style={styles.link}>{t("common.goBack")}</Text>
         </Pressable>
       </SafeAreaView>
     );
@@ -83,9 +85,9 @@ export default function AnimeDetailsScreen() {
   if (!anime) {
     return (
       <SafeAreaView style={[styles.screen, styles.centered]}>
-        <Text style={styles.notFoundText}>Anime not found</Text>
+        <Text style={styles.notFoundText}>{t("anime.notFound")}</Text>
         <Pressable onPress={goBack} hitSlop={8}>
-          <Text style={styles.link}>Go back</Text>
+          <Text style={styles.link}>{t("common.goBack")}</Text>
         </Pressable>
       </SafeAreaView>
     );
@@ -125,7 +127,7 @@ export default function AnimeDetailsScreen() {
             <Text style={styles.metaDot}>•</Text>
             <Text style={styles.meta}>{anime.status}</Text>
             <Text style={styles.metaDot}>•</Text>
-            <Text style={styles.meta}>{anime.episodes} episodes</Text>
+            <Text style={styles.meta}>{t("anime.episodes", { n: anime.episodes })}</Text>
           </View>
 
           <View style={styles.genres}>
@@ -136,7 +138,7 @@ export default function AnimeDetailsScreen() {
             ))}
           </View>
 
-          <Text style={styles.sectionTitle}>My list</Text>
+          <Text style={styles.sectionTitle}>{t("anime.myList")}</Text>
           <View style={styles.pickerWrapper}>
             <WatchStatusPicker
               types={watchTypes ?? []}
@@ -146,7 +148,7 @@ export default function AnimeDetailsScreen() {
             />
           </View>
 
-          <Text style={styles.sectionTitle}>Synopsis</Text>
+          <Text style={styles.sectionTitle}>{t("anime.synopsis")}</Text>
           <Text style={styles.description}>{anime.description}</Text>
 
           <Pressable
@@ -159,7 +161,7 @@ export default function AnimeDetailsScreen() {
             }
           >
             <Ionicons name="play" size={18} color={colors.primaryText} />
-            <Text style={styles.watchText}>Watch now</Text>
+            <Text style={styles.watchText}>{t("anime.watchNow")}</Text>
           </Pressable>
         </View>
       </ScrollView>

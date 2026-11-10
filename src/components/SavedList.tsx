@@ -1,5 +1,6 @@
 import { AnimeCard } from "@/components/AnimeCard";
 import { EmptyState, ErrorState, LoadingState } from "@/components/StateView";
+import { useLanguage } from "@/hooks/use-language";
 import type { AnimeDetail } from "@/types/anime-types";
 import { FlatList, StyleSheet, View } from "react-native";
 
@@ -20,10 +21,11 @@ export function SavedList({
   onRetry,
   onEndReached,
 }: SavedListProps) {
+  const { t } = useLanguage();
   const styles = getStyles();
 
   if (loading && anime.length === 0) {
-    return <LoadingState label="Loading saved..." />;
+    return <LoadingState label={t("saved.loading")} />;
   }
 
   if (error) {
@@ -42,11 +44,11 @@ export function SavedList({
       onEndReachedThreshold={0.4}
       ListEmptyComponent={
         <View style={styles.emptyBody}>
-          <EmptyState message="Nothing in this list yet" />
+          <EmptyState message={t("saved.empty")} />
         </View>
       }
       ListFooterComponent={
-        loadingMore ? <LoadingState label="Loading more..." /> : undefined
+        loadingMore ? <LoadingState label={t("common.loadingMore")} /> : undefined
       }
       renderItem={({ item }) => <AnimeCard anime={item} />}
     />

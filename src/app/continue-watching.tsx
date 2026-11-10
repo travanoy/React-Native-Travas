@@ -1,6 +1,7 @@
 import { ErrorState, LoadingState } from "@/components/StateView";
 import { palette } from "@/constants/theme";
 import { useContinueWatching } from "@/hooks/use-collections";
+import { useLanguage } from "@/hooks/use-language";
 import { useTheme } from "@/hooks/use-theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -11,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function ContinueWatchingScreen() {
   const router = useRouter();
   const { colorScheme } = useTheme();
+  const { t } = useLanguage();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
   const { data, loading, error, refetch } = useContinueWatching();
@@ -28,10 +30,10 @@ export default function ContinueWatchingScreen() {
         <Pressable style={styles.backButton} onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={22} color={colors.text} />
         </Pressable>
-        <Text style={styles.headerTitle}>Continue Watching</Text>
+        <Text style={styles.headerTitle}>{t("continueWatching.title")}</Text>
       </View>
 
-      {loading && !data ? <LoadingState label="Loading list..." /> : null}
+      {loading && !data ? <LoadingState label={t("common.loadingList")} /> : null}
       {error ? <ErrorState message={error} onRetry={() => void refetch()} /> : null}
 
       <FlatList

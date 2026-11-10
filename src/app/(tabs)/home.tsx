@@ -5,11 +5,13 @@ import { NewEpisodes } from "@/components/NewEpisodes";
 import { EmptyState, ErrorState, LoadingState } from "@/components/StateView";
 import { palette } from "@/constants/theme";
 import { useBanner } from "@/hooks/use-anime";
+import { useLanguage } from "@/hooks/use-language";
+import { useUnreadCount } from "@/hooks/use-notifications";
 import { useSearchAnime } from "@/hooks/use-search";
 import { useTheme } from "@/hooks/use-theme";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import {
   FlatList,
   Pressable,
@@ -24,9 +26,18 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function HomeScreen() {
   const router = useRouter();
   const { colorScheme, toggleTheme } = useTheme();
+  const { t } = useLanguage();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
   const { data: banner, loading, error, refetch } = useBanner();
+  const { data: unread, refetch: refetchUnread } = useUnreadCount();
+  const unreadCount = unread?.count ?? 0;
+
+  useFocusEffect(
+    useCallback(() => {
+      void refetchUnread();
+    }, [refetchUnread]),
+  );
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -67,9 +78,16 @@ export default function HomeScreen() {
         <View style={styles.headerIcons}>
           <Pressable
             style={styles.iconButton}
-            onPress={() => router.push("/new-episodes")}
+            onPress={() => router.push("/notifications")}
           >
             <Ionicons name="notifications-outline" size={22} color={colors.text} />
+            {unreadCount > 0 ? (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </Text>
+              </View>
+            ) : null}
           </Pressable>
           <Pressable style={styles.iconButton} onPress={toggleSearch}>
             <Ionicons
@@ -98,7 +116,7 @@ export default function HomeScreen() {
             style={styles.searchInput}
             value={searchInput}
             onChangeText={setSearchInput}
-            placeholder="Search anime..."
+            placeholder={t("home.searchPlaceholder")}
             placeholderTextColor={colors.textMuted}
             autoFocus
             returnKeyType="search"
@@ -124,7 +142,7 @@ export default function HomeScreen() {
           onEndReachedThreshold={0.4}
           ListHeaderComponent={
             searchLoading ? (
-              <LoadingState label="Searching..." />
+              <LoadingState label={t("home.searching")} />
             ) : searchError ? (
               <ErrorState message={searchError} onRetry={() => void searchRefetch()} />
             ) : undefined
@@ -133,13 +151,15 @@ export default function HomeScreen() {
             searchLoading || searchError ? undefined : (
               <View style={styles.emptyBody}>
                 <EmptyState
-                  message={searchInput ? "No results" : "Type to search anime"}
+                  message={
+                    searchInput ? t("home.noResults") : t("home.typeToSearch")
+                  }
                 />
               </View>
             )
           }
           ListFooterComponent={
-            loadingMore ? <LoadingState label="Loading more..." /> : undefined
+            loadingMore ? <LoadingState label={t("common.loadingMore")} /> : undefined
           }
           renderItem={({ item }) => <AnimeCard anime={item} />}
         />
@@ -152,7 +172,7 @@ export default function HomeScreen() {
 
           {loading && !banner ? (
             <View style={styles.bannerState}>
-              <LoadingState label="Loading banner..." />
+              <LoadingState label={t("home.loadingBanner")} />
             </View>
           ) : null}
 
@@ -203,6 +223,23 @@ const getStyles = (scheme: "light" | "dark") => {
       backgroundColor: colors.surface,
       alignItems: "center",
       justifyContent: "center",
+    },
+    badge: {
+      position: "absolute",
+      top: -2,
+      right: -2,
+      minWidth: 16,
+      height: 16,
+      paddingHorizontal: 3,
+      borderRadius: 8,
+      backgroundColor: colors.danger,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    badgeText: {
+      fontSize: 10,
+      fontWeight: "700",
+      color: "#FFFFFF",
     },
     bannerState: {
       height: 200,

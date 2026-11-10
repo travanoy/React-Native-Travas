@@ -1,6 +1,7 @@
 import { ApiError } from "@/api/client";
 import { palette } from "@/constants/theme";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { useTheme } from "@/hooks/use-theme";
 import { StatusBar } from "expo-status-bar";
 import { Controller, useForm } from "react-hook-form";
@@ -22,6 +23,7 @@ import { signUpSchema, SignUpSchema } from "@/features/auth/auth.schema";
 
 export default function SignUpForm() {
   const { colorScheme } = useTheme();
+  const { t } = useLanguage();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
   const { signUp } = useAuth();
@@ -44,14 +46,14 @@ export default function SignUpForm() {
         password: values.password,
       });
       reset();
-      Alert.alert("Success", "Account created");
+      Alert.alert(t("auth.success"), t("auth.accountCreated"));
       router.replace("/home");
     } catch (error) {
       const message =
         error instanceof ApiError
           ? error.message
-          : "Could not create your account. Please try again.";
-      Alert.alert("Error", message);
+          : t("auth.signupFailed");
+      Alert.alert(t("common.error"), message);
     }
   };
 
@@ -78,8 +80,8 @@ export default function SignUpForm() {
               </View>
             </View>
 
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>join to travas</Text>
+            <Text style={styles.title}>{t("auth.createAccount")}</Text>
+            <Text style={styles.subtitle}>{t("auth.joinTravas")}</Text>
 
             <View style={styles.formContainer}>
               <Controller
@@ -87,11 +89,11 @@ export default function SignUpForm() {
                 name="email"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <View style={styles.field}>
-                    <Text style={styles.label}>Email</Text>
+                    <Text style={styles.label}>{t("auth.email")}</Text>
                     <View style={[styles.inputWrapper, errors.email && styles.inputError]}>
                       <TextInput
                         style={styles.input}
-                        placeholder="name@example.com"
+                        placeholder={t("auth.emailPlaceholder")}
                         placeholderTextColor={colors.textMuted}
                         keyboardType="email-address"
                         autoCapitalize="none"
@@ -111,11 +113,11 @@ export default function SignUpForm() {
                 name="name"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <View style={styles.field}>
-                    <Text style={styles.label}>Nickname</Text>
+                    <Text style={styles.label}>{t("auth.nickname")}</Text>
                     <View style={[styles.inputWrapper, errors.name && styles.inputError]}>
                       <TextInput
                         style={styles.input}
-                        placeholder="Твой никнейм"
+                        placeholder={t("auth.nicknamePlaceholder")}
                         placeholderTextColor={colors.textMuted}
                         autoCapitalize="none"
                         onBlur={onBlur}
@@ -133,11 +135,11 @@ export default function SignUpForm() {
                 name="password"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <View style={styles.field}>
-                    <Text style={styles.label}>Password</Text>
+                    <Text style={styles.label}>{t("auth.password")}</Text>
                     <View style={[styles.inputWrapper, errors.password && styles.inputError]}>
                       <TextInput
                         style={styles.input}
-                        placeholder="••••••••"
+                        placeholder={t("auth.passwordDots")}
                         placeholderTextColor={colors.textMuted}
                         secureTextEntry
                         autoCapitalize="none"
@@ -159,11 +161,11 @@ export default function SignUpForm() {
                 name="confirmPassword"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <View style={styles.field}>
-                    <Text style={styles.label}>Confirm Password</Text>
+                    <Text style={styles.label}>{t("auth.confirmPassword")}</Text>
                     <View style={[styles.inputWrapper, errors.confirmPassword && styles.inputError]}>
                       <TextInput
                         style={styles.input}
-                        placeholder="••••••••"
+                        placeholder={t("auth.passwordDots")}
                         placeholderTextColor={colors.textMuted}
                         secureTextEntry
                         autoCapitalize="none"
@@ -192,12 +194,12 @@ export default function SignUpForm() {
                 {isSubmitting ? (
                   <ActivityIndicator color={colors.primaryText} />
                 ) : (
-                  <Text style={styles.buttonText}>Sign up</Text>
+                  <Text style={styles.buttonText}>{t("auth.signUp")}</Text>
                 )}
               </Pressable>
 
               <Pressable onPress={() => router.push("/auth/sign-in")} style={styles.footerLink}>
-                <Text style={styles.footerText}>Уже есть аккаунт? Войти</Text>
+                <Text style={styles.footerText}>{t("auth.haveAccount")}</Text>
               </Pressable>
             </View>
           </>

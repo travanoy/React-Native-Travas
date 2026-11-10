@@ -1,4 +1,5 @@
 import { palette } from "@/constants/theme";
+import LanguageProvider from "@/context/language-provider";
 import AppThemeProvider from "@/context/theme-provider";
 import { useTheme } from "@/hooks/use-theme";
 import { setupNotificationNavigation } from "@/lib/notifications";
@@ -43,6 +44,7 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="continue-watching" options={{ headerShown: false }} />
         <Stack.Screen name="new-episodes" options={{ headerShown: false }} />
+        <Stack.Screen name="notifications" options={{ headerShown: false }} />
         <Stack.Screen name="anime/[id]/page" options={{ headerShown: false }} />
         <Stack.Screen name="anime/[id]/watch" options={{ headerShown: false }} />
       </Stack>
@@ -53,7 +55,9 @@ function RootNavigator() {
 export default function RootLayout() {
   return (
     <AppThemeProvider>
-      <RootNavigator />
+      <LanguageProvider>
+        <RootNavigator />
+      </LanguageProvider>
     </AppThemeProvider>
   );
 }

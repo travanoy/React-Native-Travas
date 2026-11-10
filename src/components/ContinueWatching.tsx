@@ -1,5 +1,6 @@
 import { palette } from "@/constants/theme";
 import { useContinueWatching } from "@/hooks/use-collections";
+import { useLanguage } from "@/hooks/use-language";
 import { useTheme } from "@/hooks/use-theme";
 import { useRouter } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -9,19 +10,20 @@ import { ErrorState, LoadingState } from "@/components/StateView";
 export function ContinueWatching() {
   const router = useRouter();
   const { colorScheme } = useTheme();
+  const { t } = useLanguage();
   const styles = getStyles(colorScheme);
   const { data, loading, error, refetch } = useContinueWatching();
 
   return (
     <View>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Continue Watching</Text>
+        <Text style={styles.sectionTitle}>{t("continueWatching.title")}</Text>
         <Pressable hitSlop={8} onPress={() => router.push("/continue-watching")}>
-          <Text style={styles.seeAll}>All &gt;</Text>
+          <Text style={styles.seeAll}>{t("common.seeAll")}</Text>
         </Pressable>
       </View>
 
-      {loading && !data ? <LoadingState label="Loading list..." /> : null}
+      {loading && !data ? <LoadingState label={t("common.loadingList")} /> : null}
 
       {error ? <ErrorState message={error} onRetry={() => void refetch()} /> : null}
 

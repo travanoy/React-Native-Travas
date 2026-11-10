@@ -1,4 +1,5 @@
 import { palette } from "@/constants/theme";
+import { useLanguage } from "@/hooks/use-language";
 import { useTheme } from "@/hooks/use-theme";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -6,7 +7,8 @@ interface LoadingStateProps {
   label?: string;
 }
 
-export function LoadingState({ label = "Loading..." }: LoadingStateProps) {
+export function LoadingState({ label }: LoadingStateProps) {
+  const { t } = useLanguage();
   const { colorScheme } = useTheme();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
@@ -14,7 +16,7 @@ export function LoadingState({ label = "Loading..." }: LoadingStateProps) {
   return (
     <View style={styles.container}>
       <ActivityIndicator color={colors.primary} />
-      <Text style={styles.message}>{label}</Text>
+      <Text style={styles.message}>{label ?? t("common.loading")}</Text>
     </View>
   );
 }
@@ -25,6 +27,7 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({ message, onRetry }: ErrorStateProps) {
+  const { t } = useLanguage();
   const { colorScheme } = useTheme();
   const styles = getStyles(colorScheme);
 
@@ -36,7 +39,7 @@ export function ErrorState({ message, onRetry }: ErrorStateProps) {
           style={({ pressed }) => [styles.button, pressed && styles.pressed]}
           onPress={onRetry}
         >
-          <Text style={styles.buttonText}>Retry</Text>
+          <Text style={styles.buttonText}>{t("common.retry")}</Text>
         </Pressable>
       ) : null}
     </View>

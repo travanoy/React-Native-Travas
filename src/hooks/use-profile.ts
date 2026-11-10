@@ -36,7 +36,6 @@ export function useProfile() {
     try {
       setStats(await userApi.getStats());
     } catch {
-      // Статистика не критична — профиль не должен падать из-за неё.
     }
   }, []);
 

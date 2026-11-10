@@ -11,10 +11,6 @@ interface PaginationState<T> {
   page: number;
 }
 
-/**
- * Универсальный infinite-scroll: грузит первую страницу, дальше — по onEndReached.
- * При смене `deps` список сбрасывается и грузится заново.
- */
 export function usePagination<T>(
   fetcher: (page: number, signal: AbortSignal) => Promise<PagedResult<T>>,
   deps: readonly unknown[] = [],

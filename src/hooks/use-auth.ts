@@ -27,7 +27,6 @@ export function useAuth() {
     try {
       await authApi.logout();
     } catch {
-      // Даже если сервер недоступен, локальную сессию нужно очистить.
     }
 
     await clearAuth();

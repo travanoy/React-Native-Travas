@@ -1,6 +1,7 @@
 import { ApiError } from "@/api/client";
 import { palette } from "@/constants/theme";
 import { useAuth } from "@/hooks/use-auth";
+import { useLanguage } from "@/hooks/use-language";
 import { useTheme } from "@/hooks/use-theme";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
@@ -23,6 +24,7 @@ import { signInSchema, SignInSchema } from "@/features/auth/auth.schema";
 
 export default function SignIn() {
   const { colorScheme } = useTheme();
+  const { t } = useLanguage();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
   const { signIn } = useAuth();
@@ -46,8 +48,8 @@ export default function SignIn() {
       const message =
         error instanceof ApiError
           ? error.message
-          : "Could not log in. Please try again.";
-      Alert.alert("Error", message);
+          : t("auth.loginFailed");
+      Alert.alert(t("common.error"), message);
     }
   };
 
@@ -74,8 +76,8 @@ export default function SignIn() {
               </View>
             </View>
 
-            <Text style={styles.title}>Welcome back</Text>
-            <Text style={styles.subtitle}>Sign in to continue</Text>
+            <Text style={styles.title}>{t("auth.welcomeBack")}</Text>
+            <Text style={styles.subtitle}>{t("auth.signInToContinue")}</Text>
 
             <View style={styles.formContainer}>
               <Controller
@@ -83,11 +85,11 @@ export default function SignIn() {
                 name="email"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <View style={styles.field}>
-                    <Text style={styles.label}>Email</Text>
+                    <Text style={styles.label}>{t("auth.email")}</Text>
                     <View style={[styles.inputWrapper, errors.email && styles.inputError]}>
                       <TextInput
                         style={styles.input}
-                        placeholder="name@example.com"
+                        placeholder={t("auth.emailPlaceholder")}
                         placeholderTextColor={colors.textMuted}
                         keyboardType="email-address"
                         autoCapitalize="none"
@@ -107,11 +109,11 @@ export default function SignIn() {
                 name="password"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <View style={styles.field}>
-                    <Text style={styles.label}>Password</Text>
+                    <Text style={styles.label}>{t("auth.password")}</Text>
                     <View style={[styles.inputWrapper, errors.password && styles.inputError]}>
                       <TextInput
                         style={styles.input}
-                        placeholder="Your password"
+                        placeholder={t("auth.passwordPlaceholder")}
                         placeholderTextColor={colors.textMuted}
                         secureTextEntry
                         autoCapitalize="none"
@@ -136,12 +138,12 @@ export default function SignIn() {
                 {isSubmitting ? (
                   <ActivityIndicator color={colors.primaryText} />
                 ) : (
-                  <Text style={styles.buttonText}>Sign in</Text>
+                  <Text style={styles.buttonText}>{t("auth.signIn")}</Text>
                 )}
               </Pressable>
 
               <Pressable onPress={() => router.push("/auth/sign-up")} style={styles.footerLink}>
-                <Text style={styles.footerText}>Don&apos;t have an account? Sign up</Text>
+                <Text style={styles.footerText}>{t("auth.noAccount")}</Text>
               </Pressable>
             </View>
           </>

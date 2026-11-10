@@ -17,8 +17,6 @@ export default function Saved() {
   const { items: anime, loading, loadingMore, error, refetch, loadMore } =
     useSaved(selectedSlug);
 
-  // Обновляем список при возврате на таб: статусы меняются с других экранов,
-  // а табы остаются смонтированными и сами не перезапрашивают данные.
   const firstFocus = useRef(true);
   useFocusEffect(
     useCallback(() => {

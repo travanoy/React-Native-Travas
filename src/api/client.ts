@@ -22,7 +22,6 @@ export interface RequestOptions {
   body?: unknown;
   headers?: Record<string, string>;
   signal?: AbortSignal;
-  /** Внутренний флаг: не пытаться обновить токен (используется для auth-запросов). */
   skipAuthRefresh?: boolean;
 }
 
@@ -67,10 +66,6 @@ function isAuthPath(path: string) {
   return AUTH_PATHS.some((authPath) => path.startsWith(authPath));
 }
 
-/**
- * Обновление access-токена по refresh. Single-flight: параллельные 401 ждут
- * один и тот же запрос, а не плодят десяток refresh-вызовов.
- */
 async function refreshAccessToken(): Promise<string | null> {
   if (!refreshPromise) {
     refreshPromise = (async () => {
