@@ -35,8 +35,16 @@
         }
       ],
       "expo-image",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Travas to access your photos.",
+          "cameraPermission": "Allow Travas to take photos."
+        }
+      ],
       "expo-status-bar",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true,

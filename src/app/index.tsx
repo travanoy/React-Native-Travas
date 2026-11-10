@@ -1,5 +1,6 @@
 import { palette } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
+import { getAuthToken } from "@/lib/user-storage";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { Image, StyleSheet, View } from "react-native";
@@ -10,11 +11,20 @@ export default function Index() {
   const styles = getStyles(colorScheme);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      router.replace("/auth/sign-in");
+    let active = true;
+
+    const timer = setTimeout(async () => {
+      const token = await getAuthToken();
+
+      if (active) {
+        router.replace(token ? "/home" : "/auth/sign-in");
+      }
     }, 2000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
   }, [router]);
 
   return (

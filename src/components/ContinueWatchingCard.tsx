@@ -1,6 +1,6 @@
 import { palette } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
-import { ContinueWatchingAnime } from "@/components/mock/anime";
+import type { ContinueWatchingAnime } from "@/types/anime-types";
 import { router } from "expo-router";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 

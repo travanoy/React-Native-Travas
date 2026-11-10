@@ -1,27 +1,24 @@
+import { ErrorState, LoadingState } from "@/components/StateView";
 import { palette } from "@/constants/theme";
+import { useNewEpisodes } from "@/hooks/use-collections";
 import { useTheme } from "@/hooks/use-theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { FlatList, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { NEW_EPISODES_LIST, NewEpisodeAnime } from "@/components/mock/anime";
-
-const shuffleArray = (array: NewEpisodeAnime[]) =>
-  [...array].sort(() => Math.random() - 0.5);
 
 export default function NewEpisodesScreen() {
   const router = useRouter();
   const { colorScheme } = useTheme();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
-  const [animeList, setAnimeList] = useState(() => shuffleArray(NEW_EPISODES_LIST));
+  const { data, loading, error, refetch } = useNewEpisodes();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setAnimeList(shuffleArray(NEW_EPISODES_LIST));
+    await refetch();
     setRefreshing(false);
   };
 
@@ -34,12 +31,20 @@ export default function NewEpisodesScreen() {
         <Text style={styles.headerTitle}>New Episodes</Text>
       </View>
 
+      {loading && !data ? <LoadingState label="Loading list..." /> : null}
+      {error ? <ErrorState message={error} onRetry={() => void refetch()} /> : null}
+
       <FlatList
-        data={animeList}
+        data={data ?? []}
         renderItem={({ item }) => (
           <Pressable
             style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-            onPress={() => router.push(`/anime/${item.id}/page`)}
+            onPress={() =>
+              router.push({
+                pathname: "/anime/[id]/watch",
+                params: { id: item.id, shikimoriId: String(item.shikimoriId) },
+              })
+            }
           >
             <Image source={{ uri: item.coverImage }} style={styles.image} />
             <Text style={styles.title} numberOfLines={1}>

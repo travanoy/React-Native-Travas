@@ -1,11 +1,17 @@
 import { palette } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
+import { registerPushToken } from "@/lib/notifications";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { useEffect } from "react";
 
 export default function TabsLayout() {
   const { colorScheme } = useTheme();
   const colors = palette[colorScheme];
+
+  useEffect(() => {
+    void registerPushToken();
+  }, []);
 
   return (
     <Tabs

@@ -3,7 +3,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { BannerAnime } from "@/components/mock/anime";
+import type { BannerAnime } from "@/types/anime-types";
 
 export function AnimeBanner({ anime }: { anime: BannerAnime }) {
   const { colorScheme } = useTheme();

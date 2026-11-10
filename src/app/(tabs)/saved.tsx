@@ -1,20 +1,54 @@
+import { SavedList } from "@/components/SavedList";
+import { WatchingTypeTabs } from "@/components/WatchingTypeTabs";
 import { palette } from "@/constants/theme";
+import { useSaved, useWatchStatuses } from "@/hooks/use-collections";
 import { useTheme } from "@/hooks/use-theme";
-import { StyleSheet, Text, View } from "react-native";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Saved() {
   const { colorScheme } = useTheme();
   const styles = getStyles(colorScheme);
+  const [selectedSlug, setSelectedSlug] = useState("");
+
+  const { data: types } = useWatchStatuses();
+  const { items: anime, loading, loadingMore, error, refetch, loadMore } =
+    useSaved(selectedSlug);
+
+  // Обновляем список при возврате на таб: статусы меняются с других экранов,
+  // а табы остаются смонтированными и сами не перезапрашивают данные.
+  const firstFocus = useRef(true);
+  useFocusEffect(
+    useCallback(() => {
+      if (firstFocus.current) {
+        firstFocus.current = false;
+        return;
+      }
+
+      void refetch();
+    }, [refetch]),
+  );
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Saved</Text>
+      <View style={styles.tabsWrapper}>
+        <WatchingTypeTabs
+          types={types ?? []}
+          selectedSlug={selectedSlug}
+          setSelectedSlug={setSelectedSlug}
+        />
       </View>
-      <View style={styles.body}>
-        <Text style={styles.empty}>Nothing here yet</Text>
-      </View>
+
+      <SavedList
+        anime={anime}
+        loading={loading}
+        loadingMore={loadingMore}
+        error={error}
+        onRetry={() => void refetch()}
+        onEndReached={() => void loadMore()}
+      />
     </SafeAreaView>
   );
 }
@@ -27,24 +61,9 @@ const getStyles = (scheme: "light" | "dark") => {
       flex: 1,
       backgroundColor: colors.background,
     },
-    header: {
-      paddingHorizontal: 16,
-      paddingTop: 10,
-      paddingBottom: 20,
-    },
-    title: {
-      fontSize: 28,
-      fontWeight: "bold",
-      color: colors.text,
-    },
-    body: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    empty: {
-      fontSize: 15,
-      color: colors.textMuted,
+    tabsWrapper: {
+      marginHorizontal: -16,
+      marginBottom: 20,
     },
   });
 };

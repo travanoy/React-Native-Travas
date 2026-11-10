@@ -1,6 +1,7 @@
+import { ApiError } from "@/api/client";
 import { palette } from "@/constants/theme";
+import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,15 +18,13 @@ import {
   View,
 } from "react-native";
 import { router } from "expo-router";
-import { signUpSchema, SignUpSchema } from "./auth.schema";
-
-const USER_STORAGE_KEY = "user";
-const USER_AUTH_STORAGE_KEY = "user_auth";
+import { signUpSchema, SignUpSchema } from "@/features/auth/auth.schema";
 
 export default function SignUpForm() {
   const { colorScheme } = useTheme();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
+  const { signUp } = useAuth();
 
   const {
     control,
@@ -37,16 +36,22 @@ export default function SignUpForm() {
     defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   });
 
-  const onSubmit = async ({ confirmPassword, ...user }: SignUpSchema) => {
+  const onSubmit = async (values: SignUpSchema) => {
     try {
-      await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
-      await AsyncStorage.setItem(USER_AUTH_STORAGE_KEY, JSON.stringify(true));
+      await signUp({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      });
       reset();
       Alert.alert("Success", "Account created");
-      router.replace("/auth/sign-in");
+      router.replace("/home");
     } catch (error) {
-      console.error("Sign up failed:", error);
-      Alert.alert("Error", "Could not create your account. Please try again.");
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : "Could not create your account. Please try again.";
+      Alert.alert("Error", message);
     }
   };
 

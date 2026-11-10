@@ -1,14 +1,16 @@
 import { palette } from "@/constants/theme";
+import { useContinueWatching } from "@/hooks/use-collections";
 import { useTheme } from "@/hooks/use-theme";
 import { useRouter } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ContinueWatchingCard } from "@/components/ContinueWatchingCard";
-import { CONTINUE_WATCHING_LIST } from "@/components/mock/anime";
+import { ErrorState, LoadingState } from "@/components/StateView";
 
 export function ContinueWatching() {
   const router = useRouter();
   const { colorScheme } = useTheme();
   const styles = getStyles(colorScheme);
+  const { data, loading, error, refetch } = useContinueWatching();
 
   return (
     <View>
@@ -19,15 +21,21 @@ export function ContinueWatching() {
         </Pressable>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.row}
-      >
-        {CONTINUE_WATCHING_LIST.map((anime) => (
-          <ContinueWatchingCard key={anime.id} anime={anime} />
-        ))}
-      </ScrollView>
+      {loading && !data ? <LoadingState label="Loading list..." /> : null}
+
+      {error ? <ErrorState message={error} onRetry={() => void refetch()} /> : null}
+
+      {data && data.length > 0 ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.row}
+        >
+          {data.map((anime) => (
+            <ContinueWatchingCard key={anime.id} anime={anime} />
+          ))}
+        </ScrollView>
+      ) : null}
     </View>
   );
 }

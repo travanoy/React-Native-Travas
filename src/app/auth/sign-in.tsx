@@ -1,7 +1,8 @@
+import { ApiError } from "@/api/client";
 import { palette } from "@/constants/theme";
+import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
 import { zodResolver } from "@hookform/resolvers/zod";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Controller, useForm } from "react-hook-form";
@@ -18,14 +19,13 @@ import {
   View,
 } from "react-native";
 
-import { signInSchema, SignInSchema } from "./auth.schema";
-
-const USER_STORAGE_KEY = "user";
+import { signInSchema, SignInSchema } from "@/features/auth/auth.schema";
 
 export default function SignIn() {
   const { colorScheme } = useTheme();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
+  const { signIn } = useAuth();
 
   const {
     control,
@@ -39,19 +39,15 @@ export default function SignIn() {
 
   const onSubmit = async (data: SignInSchema) => {
     try {
-      const stored = await AsyncStorage.getItem(USER_STORAGE_KEY);
-      const user = stored ? JSON.parse(stored) : null;
-
-      if (!user || user.email !== data.email || user.password !== data.password) {
-        Alert.alert("Error", "Invalid email or password");
-        return;
-      }
-
+      await signIn(data);
       reset();
       router.replace("/home");
     } catch (error) {
-      console.error("Sign in failed:", error);
-      Alert.alert("Error", "Could not log in. Please try again.");
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : "Could not log in. Please try again.";
+      Alert.alert("Error", message);
     }
   };
 

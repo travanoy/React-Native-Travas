@@ -1,8 +1,13 @@
-import { getAnimeById } from "@/components/mock/anime";
+import { ErrorState, LoadingState } from "@/components/StateView";
+import { WatchStatusPicker } from "@/components/WatchStatusPicker";
+import { savedApi } from "@/api/saved.api";
 import { palette } from "@/constants/theme";
+import { useWatchStatuses } from "@/hooks/use-collections";
+import { useAnimeDetail } from "@/hooks/use-anime";
 import { useTheme } from "@/hooks/use-theme";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -10,17 +15,74 @@ const goBack = () =>
   router.canGoBack() ? router.back() : router.replace("/(tabs)/home");
 
 export default function AnimeDetailsScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const params = useLocalSearchParams<{ id: string }>();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const { colorScheme } = useTheme();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
   const { bottom } = useSafeAreaInsets();
 
-  const anime = getAnimeById(id);
+  const { data: anime, loading, error, refetch } = useAnimeDetail(id ?? "");
+
+  const { data: watchTypes } = useWatchStatuses();
+  const [statusSlug, setStatusSlug] = useState<string | null>(null);
+  const [savingStatus, setSavingStatus] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setStatusSlug(anime?.watchStatusSlug ?? null);
+  }, [anime?.watchStatusSlug]);
+
+  const changeWatchStatus = async (slug: string | null) => {
+    if (!anime || savingStatus) {
+      return;
+    }
+
+    setSavingStatus(true);
+    const previous = statusSlug;
+    setStatusSlug(slug);
+
+    try {
+      if (slug) {
+        const updated = await savedApi.setWatchStatus(anime.id, slug);
+        setStatusSlug(updated.watchStatusSlug ?? null);
+      } else {
+        await savedApi.removeWatchStatus(anime.id);
+        setStatusSlug(null);
+      }
+    } catch (cause) {
+      setStatusSlug(previous);
+      Alert.alert(
+        "Error",
+        cause instanceof Error ? cause.message : "Could not update list.",
+      );
+    } finally {
+      setSavingStatus(false);
+    }
+  };
+
+  if (loading && !anime) {
+    return (
+      <SafeAreaView style={[styles.screen, styles.centered]}>
+        <LoadingState label="Loading anime..." />
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={[styles.screen, styles.centered]}>
+        <ErrorState message={error} onRetry={() => void refetch()} />
+        <Pressable onPress={goBack} hitSlop={8}>
+          <Text style={styles.link}>Go back</Text>
+        </Pressable>
+      </SafeAreaView>
+    );
+  }
 
   if (!anime) {
     return (
-      <SafeAreaView style={[styles.screen, styles.notFound]}>
+      <SafeAreaView style={[styles.screen, styles.centered]}>
         <Text style={styles.notFoundText}>Anime not found</Text>
         <Pressable onPress={goBack} hitSlop={8}>
           <Text style={styles.link}>Go back</Text>
@@ -74,12 +136,27 @@ export default function AnimeDetailsScreen() {
             ))}
           </View>
 
+          <Text style={styles.sectionTitle}>My list</Text>
+          <View style={styles.pickerWrapper}>
+            <WatchStatusPicker
+              types={watchTypes ?? []}
+              selectedSlug={statusSlug}
+              disabled={savingStatus}
+              onSelect={(slug) => void changeWatchStatus(slug)}
+            />
+          </View>
+
           <Text style={styles.sectionTitle}>Synopsis</Text>
           <Text style={styles.description}>{anime.description}</Text>
 
           <Pressable
             style={({ pressed }) => [styles.watchButton, pressed && styles.pressed]}
-            onPress={() => Alert.alert("Watch", `${anime.title} — episode 1`)}
+            onPress={() =>
+              router.push({
+                pathname: "/anime/[id]/watch",
+                params: { id: anime.id, shikimoriId: String(anime.shikimoriId) },
+              })
+            }
           >
             <Ionicons name="play" size={18} color={colors.primaryText} />
             <Text style={styles.watchText}>Watch now</Text>
@@ -97,6 +174,11 @@ const getStyles = (scheme: "light" | "dark") => {
     screen: {
       flex: 1,
       backgroundColor: colors.background,
+    },
+    centered: {
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 12,
     },
     content: {
       paddingBottom: 24,
@@ -206,6 +288,10 @@ const getStyles = (scheme: "light" | "dark") => {
       fontWeight: "600",
       color: colors.text,
     },
+    pickerWrapper: {
+      marginHorizontal: -16,
+      marginBottom: 22,
+    },
     sectionTitle: {
       fontSize: 18,
       fontWeight: "700",
@@ -234,11 +320,6 @@ const getStyles = (scheme: "light" | "dark") => {
     },
     pressed: {
       opacity: 0.85,
-    },
-    notFound: {
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 12,
     },
     notFoundText: {
       fontSize: 18,
