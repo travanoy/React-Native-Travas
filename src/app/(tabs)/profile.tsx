@@ -5,14 +5,13 @@ import { useLanguage } from "@/hooks/use-language";
 import { useTheme } from "@/hooks/use-theme";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useRef, useState } from "react";
 import {
   Alert,
   Image,
   Pressable,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   View,
@@ -57,11 +56,11 @@ const pickAvatar = async (
 };
 
 export default function Profile() {
-  const { colorScheme, toggleTheme } = useTheme();
-  const { language, setLanguage, t } = useLanguage();
+  const router = useRouter();
+  const { colorScheme } = useTheme();
+  const { t } = useLanguage();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
-  const isDark = colorScheme === "dark";
 
   const { user, stats, loading, error, reload, reloadStats, updateName, updateAvatar } = useProfile();
   const [draftName, setDraftName] = useState<string | null>(null);
@@ -89,7 +88,17 @@ export default function Profile() {
   };
 
   const applyPatchFrom = async (source: "camera" | "library") => {
-    const uri = await pickAvatar(source, t);
+    let uri: string | null;
+
+    try {
+      uri = await pickAvatar(source, t);
+    } catch (cause) {
+      Alert.alert(
+        t("common.error"),
+        cause instanceof Error ? cause.message : t("profile.couldNotUpload"),
+      );
+      return;
+    }
 
     if (!uri) {
       return;
@@ -156,6 +165,13 @@ export default function Profile() {
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.header}>
         <Text style={styles.title}>{t("profile.title")}</Text>
+        <Pressable
+          style={styles.settingsButton}
+          hitSlop={8}
+          onPress={() => router.push("/settings")}
+        >
+          <Ionicons name="settings-outline" size={22} color={colors.text} />
+        </Pressable>
       </View>
 
       <View style={styles.profileCard}>
@@ -248,58 +264,6 @@ export default function Profile() {
           </View>
         </View>
       ) : null}
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t("profile.appearance")}</Text>
-
-        <View style={styles.option}>
-          <View style={styles.optionLeft}>
-            <Ionicons
-              name={isDark ? "moon-outline" : "sunny-outline"}
-              size={20}
-              color={colors.text}
-            />
-            <Text style={styles.optionLabel}>
-              {isDark ? t("profile.darkTheme") : t("profile.lightTheme")}
-            </Text>
-          </View>
-
-          <Switch
-            value={isDark}
-            onValueChange={(value) => toggleTheme(value ? "dark" : "light")}
-            trackColor={{ false: colors.switchTrackOff, true: colors.switchTrackOn }}
-            thumbColor={colors.switchThumb}
-            ios_backgroundColor={colors.switchTrackOff}
-          />
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t("profile.language")}</Text>
-
-        <View style={styles.langRow}>
-          {(["en", "ru"] as const).map((lang) => {
-            const active = lang === language;
-
-            return (
-              <Pressable
-                key={lang}
-                style={[styles.langButton, active && styles.langButtonActive]}
-                onPress={() => setLanguage(lang)}
-              >
-                <Text
-                  style={[
-                    styles.langButtonText,
-                    active && styles.langButtonTextActive,
-                  ]}
-                >
-                  {lang === "en" ? "English" : "Русский"}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      </View>
     </SafeAreaView>
   );
 }
@@ -313,6 +277,9 @@ const getStyles = (scheme: "light" | "dark") => {
       backgroundColor: colors.background,
     },
     header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
       paddingHorizontal: 16,
       paddingTop: 10,
       paddingBottom: 20,
@@ -321,6 +288,14 @@ const getStyles = (scheme: "light" | "dark") => {
       fontSize: 28,
       fontWeight: "bold",
       color: colors.text,
+    },
+    settingsButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.surface,
+      alignItems: "center",
+      justifyContent: "center",
     },
     profileCard: {
       alignItems: "center",

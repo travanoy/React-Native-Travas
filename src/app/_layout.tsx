@@ -45,6 +45,7 @@ function RootNavigator() {
         <Stack.Screen name="continue-watching" options={{ headerShown: false }} />
         <Stack.Screen name="new-episodes" options={{ headerShown: false }} />
         <Stack.Screen name="notifications" options={{ headerShown: false }} />
+        <Stack.Screen name="settings" options={{ headerShown: false }} />
         <Stack.Screen name="anime/[id]/page" options={{ headerShown: false }} />
         <Stack.Screen name="anime/[id]/watch" options={{ headerShown: false }} />
       </Stack>

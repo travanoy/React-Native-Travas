@@ -61,6 +61,7 @@ const getStyles = (scheme: "light" | "dark") => {
     },
     tabsWrapper: {
       marginHorizontal: -16,
+      marginTop: 17,
       marginBottom: 20,
     },
   });

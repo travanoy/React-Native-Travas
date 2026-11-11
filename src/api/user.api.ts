@@ -16,9 +16,15 @@ export const userApi = {
 
   uploadAvatar: (uri: string) => {
     const form = new FormData();
-    const name = uri.split("/").pop() ?? "avatar.jpg";
-    const extension = name.split(".").pop()?.toLowerCase();
-    const type = extension === "png" ? "image/png" : "image/jpeg";
+    const match = uri.match(/\.(jpe?g|png|webp)(?:$|[?#])/i);
+    const extension = (match?.[1] ?? "jpg").toLowerCase();
+    const name = `avatar.${extension}`;
+    const type =
+      extension === "png"
+        ? "image/png"
+        : extension === "webp"
+          ? "image/webp"
+          : "image/jpeg";
 
     form.append("avatar", { uri, name, type } as unknown as Blob);
 

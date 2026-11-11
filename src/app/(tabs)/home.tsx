@@ -25,7 +25,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { colorScheme, toggleTheme } = useTheme();
+  const { colorScheme } = useTheme();
   const { t } = useLanguage();
   const colors = palette[colorScheme];
   const styles = getStyles(colorScheme);
@@ -39,7 +39,6 @@ export default function HomeScreen() {
     }, [refetchUnread]),
   );
 
-  const [searchOpen, setSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -57,19 +56,7 @@ export default function HomeScreen() {
     loadMore,
   } = useSearchAnime(searchQuery);
 
-  const closeSearch = () => {
-    setSearchOpen(false);
-    setSearchInput("");
-    setSearchQuery("");
-  };
-
-  const toggleSearch = () => {
-    if (searchOpen) {
-      closeSearch();
-    } else {
-      setSearchOpen(true);
-    }
-  };
+  const isSearching = searchQuery.trim().length > 0;
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -89,47 +76,28 @@ export default function HomeScreen() {
               </View>
             ) : null}
           </Pressable>
-          <Pressable style={styles.iconButton} onPress={toggleSearch}>
-            <Ionicons
-              name={searchOpen ? "close" : "search-outline"}
-              size={22}
-              color={colors.text}
-            />
-          </Pressable>
-          <Pressable
-            style={styles.iconButton}
-            onPress={() => toggleTheme(colorScheme === "dark" ? "light" : "dark")}
-          >
-            <Ionicons
-              name={colorScheme === "dark" ? "sunny-outline" : "moon-outline"}
-              size={22}
-              color={colors.text}
-            />
-          </Pressable>
         </View>
       </View>
 
-      {searchOpen ? (
-        <View style={styles.searchBar}>
-          <Ionicons name="search-outline" size={18} color={colors.textMuted} />
-          <TextInput
-            style={styles.searchInput}
-            value={searchInput}
-            onChangeText={setSearchInput}
-            placeholder={t("home.searchPlaceholder")}
-            placeholderTextColor={colors.textMuted}
-            autoFocus
-            returnKeyType="search"
-          />
-          {searchInput ? (
-            <Pressable hitSlop={8} onPress={() => setSearchInput("")}>
-              <Ionicons name="close-circle" size={18} color={colors.textMuted} />
-            </Pressable>
-          ) : null}
-        </View>
-      ) : null}
+      <View style={styles.searchBar}>
+        <Ionicons name="search-outline" size={18} color={colors.textMuted} />
+        <TextInput
+          style={styles.searchInput}
+          value={searchInput}
+          onChangeText={setSearchInput}
+          placeholder={t("home.searchPlaceholder")}
+          placeholderTextColor={colors.textMuted}
+          returnKeyType="search"
+          underlineColorAndroid="transparent"
+        />
+        {searchInput ? (
+          <Pressable hitSlop={8} onPress={() => setSearchInput("")}>
+            <Ionicons name="close-circle" size={18} color={colors.textMuted} />
+          </Pressable>
+        ) : null}
+      </View>
 
-      {searchOpen ? (
+      {isSearching ? (
         <FlatList
           data={results}
           keyExtractor={(item) => item.id}
@@ -265,6 +233,7 @@ const getStyles = (scheme: "light" | "dark") => {
       flex: 1,
       fontSize: 15,
       color: colors.text,
+      outlineWidth: 0,
     },
     resultsContent: {
       paddingHorizontal: 16,

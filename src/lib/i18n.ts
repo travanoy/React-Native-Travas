@@ -69,6 +69,8 @@ export const en = {
   "profile.enterNickname": "Please enter a nickname.",
   "profile.couldNotSave": "Could not save nickname.",
 
+  "settings.title": "Settings",
+
   "anime.loading": "Loading anime...",
   "anime.notFound": "Anime not found",
   "anime.myList": "My list",
@@ -191,6 +193,8 @@ const ru: Record<TranslationKey, string> = {
   "profile.nicknameRequired": "Нужен никнейм",
   "profile.enterNickname": "Введите никнейм.",
   "profile.couldNotSave": "Не удалось сохранить никнейм.",
+
+  "settings.title": "Настройки",
 
   "anime.loading": "Загружаем аниме...",
   "anime.notFound": "Аниме не найдено",

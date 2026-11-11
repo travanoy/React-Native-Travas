@@ -105,6 +105,7 @@ const getStyles = (scheme: "light" | "dark") => {
   return StyleSheet.create({
     safe: {
       flex: 1,
+      marginTop: 17,
       backgroundColor: colors.background,
     },
     content: {
