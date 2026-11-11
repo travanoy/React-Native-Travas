@@ -1,4 +1,5 @@
 import { ErrorState, LoadingState } from "@/components/StateView";
+import { ReviewsSection } from "@/components/ReviewsSection";
 import { WatchStatusPicker } from "@/components/WatchStatusPicker";
 import { savedApi } from "@/api/saved.api";
 import { palette } from "@/constants/theme";
@@ -163,6 +164,8 @@ export default function AnimeDetailsScreen() {
             <Ionicons name="play" size={18} color={colors.primaryText} />
             <Text style={styles.watchText}>{t("anime.watchNow")}</Text>
           </Pressable>
+
+          <ReviewsSection animeId={anime.id} />
         </View>
       </ScrollView>
     </View>

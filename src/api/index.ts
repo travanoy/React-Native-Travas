@@ -11,4 +11,5 @@ export { authApi, type SignInPayload, type SignUpPayload } from "./auth.api";
 export { savedApi } from "./saved.api";
 export { notificationsApi } from "./notifications.api";
 export { playerApi } from "./player.api";
+export { reviewApi } from "./review.api";
 export { userApi, type UpdateProfilePayload } from "./user.api";
